@@ -93,7 +93,7 @@ if __name__ == "__main__":
         "--resume",
         default = None,
         type = str,
-        help = "Latest PTH checkpoint fie path (default: None)"
+        help = "Latest PTH checkpoint file path (default: None)"
     )
 
     parser.add_argument(
