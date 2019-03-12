@@ -50,15 +50,15 @@ coverage.xml
 *.mo
 *.pot
 
-# Django stuff:
+# Django files:
 *.log
 local_settings.py
 
-# Flask stuff:
+# Flask files:
 instance/
 .webassets-cache
 
-# Scrapy stuff:
+# Scrapy files:
 .scrapy
 
 # Sphinx documentation
@@ -104,9 +104,12 @@ ENV/
 data/
 input/
 saved/
-datasets/
+# datasets/
 logs/
 
+# shell scripts
+.sh
+.log
 
 # editor, os cache directory
 .vscode/
