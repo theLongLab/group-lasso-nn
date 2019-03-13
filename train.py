@@ -29,7 +29,9 @@ def main(config: dict, resume: Optional[str]) -> None:
     valid_data_loader: Optional[DataLoader] = data_loader.split_validation()
 
     # Instantiate model.
-    model: Module = get_instance(module_arch, "arch", config)
+    model: Module = get_instance(
+        module_arch, "arch", config, data_loader.dataset.feats
+    )
     print(model)
 
     # Obtain function handles for loss and metrics.
