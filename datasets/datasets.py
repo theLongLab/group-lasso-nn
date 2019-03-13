@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys
+import os
 from typing import Callable, Tuple
 
 import numpy as np
@@ -15,14 +15,27 @@ class LipidDataset(Dataset):
     Lipid dataset class. Assuming genotypes and phenotypes are sorted properly
     and rows are index matched.
     """
-    def __init__(
-        self,
-        genotype_file: str,
-        phenotype_file: str,
-        transforms = None
-    ) -> None:
+    def __init__(self, root: str, train: bool, transforms = None) -> None:
         ohe: OneHotEncoder = OneHotEncoder()  # encoder
         self.transforms: Callable = torch.from_numpy()
+
+        input_file: str
+        target_file: str
+        if train:
+            input_file = os.path.join(
+                root, "train", "lipids_genotype_" + root + "_train.csv"
+            )
+            target_file = os.path.join(
+                root, "train", "lipids_phenotype_" + root + "_train.csv"
+            )
+
+        else:
+            input_file = os.path.join(
+                root, "test", "lipids_genotype_" + root + "_test.csv"
+            )
+            target_file = os.path.join(
+                root, "test", "lipids_phenotype_" + root + "_test.csv"
+            )
 
         # One hot encoded input.
         # - 0 = homozygous ref
@@ -30,13 +43,13 @@ class LipidDataset(Dataset):
         # - 2 = homozygous alt
         self.genotypes: torch.Tensor = self.transforms(
             ohe.fit_transform(
-                pd.read_csv(genotype_file).drop("IID", axis = 1)
+                pd.read_csv(input_file).drop("IID", axis = 1)
             ).todense()
         )
 
         # Target.
         self.phenotypes: torch.Tensor = self.transform(
-            pd.read_csv(phenotype_file, usecols = [1]).values
+            pd.read_csv(target_file, usecols = [1]).values
         )
 
         self.data_len: int = len(self.phenotypes.index)  # sample size
