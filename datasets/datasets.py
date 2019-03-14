@@ -72,7 +72,7 @@ class LipidDataset(Dataset):
 
             gt_chunk_tensor: torch.Tensor = self.transforms(
                 ohe.fit_transform(gt_chunk).todense()[:-3, :]  # exclude dummies
-            )
+            ).float()
             print("Chunk {} encoding complete.".format(chunk_idx))
 
             try:
