@@ -1,16 +1,17 @@
 {
-    "name": "LipidTestNet",
+    "name": "LipidTestNet_BMI",
     "n_gpu": 1,
 
     "arch": {
-        "type": "LipidModel",
+        "type": "LipidMLP",
         "args": {}
     },
     "data_loader": {
         "type": "LipidDataLoader",
         "args":{
             "data_dir": "data/processed/bmires",
-            "batch_size": 128,
+            "chunksize": 10,
+            "batch_size": 10,
             "shuffle": true,
             "validation_split": 0.1,
             "num_workers": 2
@@ -26,7 +27,7 @@
     },
     "loss": "nll_loss",
     "metrics": [
-        "accuracy", "top_k_acc"
+        "accuracy", "top_k_accuracy"
     ],
     "lr_scheduler": {
         "type": "StepLR",
