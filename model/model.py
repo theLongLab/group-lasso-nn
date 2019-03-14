@@ -15,13 +15,15 @@ class LipidMLP(BaseModel):
         self.fc1 = nn.Linear(input_feats, 500)
         self.fc2 = nn.Linear(500, 256)
         self.fc3 = nn.Linear(256, 1)
+        self.dropout = nn.Dropout(0.5)
 
 
     def forward(self, *inputs: torch.Tensor) -> torch.Tensor:
         x: torch.Tensor = inputs[0]
-        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc1(x))  # data is already flat, no need to flatten
+        x = self.dropout(x)
         x = F.relu(self.fc2(x))
+        x = self.dropout(x)
         x = self.fc3(x)
-
-        return F.log_softmax(x, dim = 1)
+        return x
 

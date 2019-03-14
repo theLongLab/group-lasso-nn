@@ -86,7 +86,7 @@ class LipidDataset(Dataset):
         # Target.
         self.phenotypes: torch.Tensor = self.transforms(
             pd.read_csv(target_file, usecols = [1]).values
-        )
+        ).float()
 
         self.data_len: int = self.genotypes.shape[0]  # sample size
         self.feats: int = self.genotypes.shape[1]  # number of encoded features
