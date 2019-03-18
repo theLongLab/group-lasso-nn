@@ -31,7 +31,9 @@ def main(config: dict, resume: Optional[str]):
     )
 
     # Instantiate model and print summary.
-    model: Module = get_instance(module_arch, "arch", config)
+    model: Module = get_instance(
+        module_arch, "arch", config, data_loader.dataset.feats
+    )
     model.summary()
 
     # Obtain function handles of loss and metrics.

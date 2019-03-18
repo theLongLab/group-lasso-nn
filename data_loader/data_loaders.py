@@ -14,11 +14,11 @@ class LipidDataLoader(BaseDataLoader):
     def __init__(
         self,
         data_dir: str,
-        chunksize: int,
         validation_split: float,
         batch_size: int,
         shuffle: bool,
         num_workers: int,
+        chunksize: int = 100,
         training: bool = True
     ) -> None:
         self.data_dir: str = data_dir
