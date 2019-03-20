@@ -4,7 +4,7 @@ import torch
 import torch.nn.functional as F
 
 
-def adj_rsqr_loss(
+def adj_rsqr(
     output: torch.Tensor,
     target: torch.Tensor,
     input_feats: int
