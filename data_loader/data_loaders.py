@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from typing import Optional
+
 from torch.utils.data import Dataset
 from torchvision import datasets, transforms
 
@@ -18,7 +20,7 @@ class LipidDataLoader(BaseDataLoader):
         batch_size: int,
         shuffle: bool,
         num_workers: int,
-        chunksize: int = 100,
+        chunksize: Optional[int] = 100,
         training: bool = True
     ) -> None:
         self.data_dir: str = data_dir

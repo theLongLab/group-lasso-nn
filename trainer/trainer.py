@@ -95,7 +95,9 @@ class Trainer(BaseTrainer):
 
             self.optimizer.zero_grad()
             output: torch.Tensor = self.model(data)
-            loss: torch.Tensor = self.loss(output, target)
+
+            # for adjusted r-squared
+            loss: torch.Tensor = self.loss(output, target, data.shape[1])
             loss.backward()
             self.optimizer.step()
 

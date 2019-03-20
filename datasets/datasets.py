@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import os
-from typing import Callable, Tuple
+from typing import Callable, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
 from pandas.io.parsers import TextFileReader
-from sklearn.preprocessing import OneHotEncoder
 import torch
 from torch.utils.data import Dataset
 
@@ -20,10 +19,9 @@ class LipidDataset(Dataset):
         self,
         root: str,
         train: bool,
-        chunksize: int,
+        chunksize: Optional[int],
         transforms = None
     ) -> None:
-        ohe: OneHotEncoder = OneHotEncoder(categories = "auto")  # encoder
         self.transforms: Callable = torch.from_numpy
 
         phenotype_dir: str = os.path.basename(root)
@@ -40,49 +38,39 @@ class LipidDataset(Dataset):
             "lipids_phenotype_" + phenotype_dir + '_' + train_test + ".csv"
         )
 
-        # One hot encoded input.
-        # - 0 = homozygous ref
-        # - 1 = heterozygous
-        # - 2 = homozygous alt
         self.genotypes: torch.Tensor
-        ohe_dummy_rows: pd.DataFrame
-        num_cols: int
-        genotypes: TextFileReader = pd.read_csv(
+        gt: Union[pd.DataFrame, TextFileReader] = pd.read_csv(
             input_file, chunksize = chunksize
         )
 
-        print("Reading input chunks...")
-        gt_chunk: pd.DataFrame
-        chunk_idx: int
-        for chunk_idx, gt_chunk in enumerate(genotypes):
-            print("Current chunk: {}".format(chunk_idx))
-            if chunk_idx == 0:
-                print("Initializing dummies...")
-                num_cols = len(gt_chunk.columns) - 1  # not counting IID col
-                dummy_row: np.ndarray = np.zeros(num_cols, dtype = int)
-                ohe_dummy_rows = pd.DataFrame(
-                    columns = gt_chunk.columns[1:],
-                    data = np.array([dummy_row, dummy_row + 1, dummy_row + 2])
-                )
+        if chunksize is None:
+            self.genotypes = self.transforms(gt.drop("IID", axis = 1)).float()
 
-            gt_chunk = pd.concat(
-                [gt_chunk.drop("IID", axis = 1), ohe_dummy_rows]
-            )
-            print("Chunk {} dummying complete.".format(chunk_idx))
+        else:
+            print("Reading input chunks...")
+            gt_chunk: pd.DataFrame
+            chunk_idx: int = 0
+            for gt_chunk in gt:
+                print("Current chunk: {}".format(chunk_idx))
+                gt_chunk_tensor: torch.Tensor = self.transforms(
+                    gt_chunk.drop("IID", axis = 1)
+                ).float()
+                print("Chunk {} encoding complete.".format(chunk_idx))
+                del gt_chunk  # mem management
 
-            gt_chunk_tensor: torch.Tensor = self.transforms(
-                ohe.fit_transform(gt_chunk).todense()[:-3, :]  # exclude dummies
-            ).float()
-            print("Chunk {} encoding complete.".format(chunk_idx))
+                try:
+                    self.genotypes = torch.cat([
+                        self.genotypes, gt_chunk_tensor
+                    ])
+                except AttributeError:
+                    self.genotypes = gt_chunk_tensor
 
-            try:
-                self.genotypes = torch.cat([self.genotypes, gt_chunk_tensor])
-            except AttributeError:
-                self.genotypes = gt_chunk_tensor
+                del gt_chunk_tensor
+                print("Chunk {} complete.".format(chunk_idx))
 
-            print("Chunk {} complete.".format(chunk_idx))
-
+        del gt
         print("Input loading complete.")
+
         # Target.
         self.phenotypes: torch.Tensor = self.transforms(
             pd.read_csv(target_file, usecols = [1]).values
