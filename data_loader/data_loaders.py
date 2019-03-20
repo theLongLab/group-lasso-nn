@@ -20,7 +20,7 @@ class LipidDataLoader(BaseDataLoader):
         batch_size: int,
         shuffle: bool,
         num_workers: int,
-        chunksize: Optional[int] = 100,
+        chunksize: Optional[int] = None,
         training: bool = True
     ) -> None:
         self.data_dir: str = data_dir
