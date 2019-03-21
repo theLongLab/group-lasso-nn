@@ -18,7 +18,9 @@ class LipidDataset(Dataset):
         self,
         root: str,
         train: bool,
-        blocksize: Optional[float],
+        block_size: Optional[float],
+        data_dtype: Union[str, type, None],
+        dask_sample: Optional[int],
         transforms = None
     ) -> None:
         self.transforms: Callable = torch.from_numpy  # transformation fn
@@ -40,25 +42,24 @@ class LipidDataset(Dataset):
         )
 
         # Inputs.
-        gt: dd.DataFrame = dd.read_csv(input_file, blocksize = blocksize).drop(
-            "IID", axis = 1
-        )
         self.genotypes: torch.Tensor = self.transforms(
             np.array(
                 dd.read_csv(
-                    input_file, blocksize = blocksize
+                    input_file, blocksize = block_size
                 ).drop("IID", axis = 1).values
             )
         ).float()
+        print("Input loading complete.")
 
         # Target.
         self.phenotypes: torch.Tensor = self.transforms(
             np.array(
                 dd.read_csv(
-                    target_file, usecols = [1], blocksize = blocksize
+                    target_file, usecols = [1], blocksize = block_size
                 ).values
             )
         ).float()
+        print("Target loading complete.")
 
         self.data_len: int = self.genotypes.shape[0]  # sample size
         self.feats: int = self.genotypes.shape[1]  # number of encoded features
