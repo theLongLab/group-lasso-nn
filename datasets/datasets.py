@@ -45,7 +45,10 @@ class LipidDataset(Dataset):
         self.genotypes: torch.Tensor = self.transforms(
             np.array(
                 dd.read_csv(
-                    input_file, blocksize = block_size
+                    input_file,
+                    blocksize = block_size,
+                    dtype = data_dtype,
+                    sample = dask_sample
                 ).drop("IID", axis = 1).values
             )
         ).float()
@@ -55,7 +58,11 @@ class LipidDataset(Dataset):
         self.phenotypes: torch.Tensor = self.transforms(
             np.array(
                 dd.read_csv(
-                    target_file, usecols = [1], blocksize = block_size
+                    target_file,
+                    usecols = [1],
+                    blocksize = block_size,
+                    dtype = data_dtype,
+                    sample = dask_sample
                 ).values
             )
         ).float()
