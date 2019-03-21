@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import Optional, Union
+from typing import Optional
 
 from torch.utils.data import Dataset
 from torchvision import datasets, transforms
@@ -21,11 +21,14 @@ class LipidDataLoader(BaseDataLoader):
         shuffle: bool,
         num_workers: int,
         block_size: Optional[float] = None,
-        data_dtype: Union[str, type, None] = None,
-        dask_sample: Optional[int] = None,
+        data_dtype: Optional[str] = None,
+        dask_sample: Optional[float] = None,
         training: bool = True
     ) -> None:
         self.data_dir: str = data_dir
+        if dask_sample is not None:
+            dask_sample = int(dask_sample)
+            
         self.dataset: Dataset = LipidDataset(
             root = self.data_dir,
             train = training,

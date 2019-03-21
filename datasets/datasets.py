@@ -19,7 +19,7 @@ class LipidDataset(Dataset):
         root: str,
         train: bool,
         block_size: Optional[float],
-        data_dtype: Union[str, type, None],
+        data_dtype: Optional[str],
         dask_sample: Optional[int],
         transforms = None
     ) -> None:
