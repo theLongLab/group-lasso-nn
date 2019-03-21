@@ -48,8 +48,8 @@ class LipidDataset(Dataset):
                 dd.read_csv(
                     input_file, blocksize = blocksize
                 ).drop("IID", axis = 1).values
-            ).float()
-        )
+            )
+        ).float()
 
         # Target.
         self.phenotypes: torch.Tensor = self.transforms(
@@ -57,8 +57,8 @@ class LipidDataset(Dataset):
                 dd.read_csv(
                     target_file, usecols = [1], blocksize = blocksize
                 ).values
-            ).float()
-        )
+            )
+        ).float()
 
         self.data_len: int = self.genotypes.shape[0]  # sample size
         self.feats: int = self.genotypes.shape[1]  # number of encoded features
