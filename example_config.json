@@ -10,7 +10,8 @@
         "type": "LipidDataLoader",
         "args":{
             "data_dir": "data/processed/bmires",
-            "blocksize": 5e6,
+            "block_size": 5e6,
+            "dask_sample": 3e7,
             "batch_size": 10,
             "shuffle": true,
             "validation_split": 0.1,

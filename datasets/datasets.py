@@ -19,7 +19,6 @@ class LipidDataset(Dataset):
         root: str,
         train: bool,
         block_size: Optional[float],
-        data_dtype: Optional[str],
         dask_sample: Optional[int],
         transforms = None
     ) -> None:
@@ -47,7 +46,7 @@ class LipidDataset(Dataset):
                 dd.read_csv(
                     input_file,
                     blocksize = block_size,
-                    dtype = data_dtype,
+                    dtype = int,
                     sample = dask_sample
                 ).drop("IID", axis = 1).values
             )
@@ -61,7 +60,7 @@ class LipidDataset(Dataset):
                     target_file,
                     usecols = [1],
                     blocksize = block_size,
-                    dtype = data_dtype,
+                    dtype = float,
                     sample = dask_sample
                 ).values
             )
