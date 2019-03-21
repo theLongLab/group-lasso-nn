@@ -4,8 +4,7 @@ import os
 from typing import Callable, Optional, Tuple, Union
 
 import numpy as np
-import pandas as pd
-from pandas.io.parsers import TextFileReader
+import dask.dataframe as dd
 import torch
 from torch.utils.data import Dataset
 
@@ -19,63 +18,47 @@ class LipidDataset(Dataset):
         self,
         root: str,
         train: bool,
-        chunksize: Optional[int],
+        blocksize: Optional[float],
         transforms = None
     ) -> None:
-        self.transforms: Callable = torch.from_numpy
+        self.transforms: Callable = torch.from_numpy  # transformation fn
 
+        # Data folder.
         phenotype_dir: str = os.path.basename(root)
         train_test: str = "test"
         if train:
             train_test = "train"
 
-        input_file = os.path.join(
+        # File paths.
+        input_file: str = os.path.join(
             root, train_test,
             "lipids_genotype_" + phenotype_dir + '_' + train_test + ".csv"
         )
-        target_file = os.path.join(
+        target_file: str = os.path.join(
             root, train_test,
             "lipids_phenotype_" + phenotype_dir + '_' + train_test + ".csv"
         )
 
-        self.genotypes: torch.Tensor
-        gt: Union[pd.DataFrame, TextFileReader] = pd.read_csv(
-            input_file, chunksize = chunksize
+        # Inputs.
+        gt: dd.DataFrame = dd.read_csv(input_file, blocksize = blocksize).drop(
+            "IID", axis = 1
         )
-
-        if chunksize is None:
-            self.genotypes = self.transforms(
-                gt.drop("IID", axis = 1).values
+        self.genotypes: torch.Tensor = self.transforms(
+            np.array(
+                dd.read_csv(
+                    input_file, blocksize = blocksize
+                ).drop("IID", axis = 1).values
             ).float()
-
-        else:
-            print("Reading input chunks...")
-            chunk_idx: int
-            gt_chunk: pd.DataFrame
-            for chunk_idx, gt_chunk in enumerate(gt):
-                print("Current chunk: {}".format(chunk_idx))
-                gt_chunk_tensor: torch.Tensor = self.transforms(
-                    gt_chunk.drop("IID", axis = 1).values
-                ).float()
-                del gt_chunk  # mem management
-
-                try:
-                    self.genotypes = torch.cat([
-                        self.genotypes, gt_chunk_tensor
-                    ])
-                except AttributeError:
-                    self.genotypes = gt_chunk_tensor
-
-                del gt_chunk_tensor
-                print("Chunk {} complete.".format(chunk_idx))
-
-        del gt
-        print("Input loading complete.")
+        )
 
         # Target.
         self.phenotypes: torch.Tensor = self.transforms(
-            pd.read_csv(target_file, usecols = [1]).values
-        ).float()
+            np.array(
+                dd.read_csv(
+                    target_file, usecols = [1], blocksize = blocksize
+                ).values
+            ).float()
+        )
 
         self.data_len: int = self.genotypes.shape[0]  # sample size
         self.feats: int = self.genotypes.shape[1]  # number of encoded features

@@ -20,12 +20,12 @@ class LipidDataLoader(BaseDataLoader):
         batch_size: int,
         shuffle: bool,
         num_workers: int,
-        chunksize: Optional[int] = None,
+        blocksize: Optional[float],
         training: bool = True
     ) -> None:
         self.data_dir: str = data_dir
         self.dataset: Dataset = LipidDataset(
-            root = self.data_dir, train = training, chunksize = chunksize
+            root = self.data_dir, train = training, blocksize = blocksize
         )
 
         super(LipidDataLoader, self).__init__(
