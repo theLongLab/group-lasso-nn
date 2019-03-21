@@ -25,10 +25,14 @@
             "amsgrad": true
         }
     },
-    "loss": "rmse_loss",
-    "metrics": [
-        "mse"
-    ],
+    "loss": {
+        "type": "adj_rsqr",
+        "args": {}
+    },
+    "metrics": {
+        "rmse": {},
+        "rsquared": {}
+    },
     "lr_scheduler": {
         "type": "StepLR",
         "args": {

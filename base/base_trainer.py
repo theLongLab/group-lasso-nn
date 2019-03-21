@@ -24,7 +24,9 @@ class BaseTrainer:
         self,
         model: Module,
         loss: Callable,
+        loss_args: dict,
         metrics: List[Callable],
+        metric_args: List[dict],
         optimizer: Optimizer,
         config: dict,
         resume: Optional[str] = None,
@@ -44,7 +46,9 @@ class BaseTrainer:
             self.model: Module = DataParallel(model, device_ids = device_ids)
 
         self.loss: Callable = loss
+        self.loss_args: dict = loss_args
         self.metrics: List[Callable] = metrics
+        self.metric_args: List[dict] = metric_args
         self.optimizer: Optimizer = optimizer
         self.train_logger: Optional[Logger] = train_logger
 

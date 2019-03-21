@@ -44,18 +44,19 @@ class LipidDataset(Dataset):
         )
 
         if chunksize is None:
-            self.genotypes = self.transforms(gt.drop("IID", axis = 1)).float()
+            self.genotypes = self.transforms(
+                gt.drop("IID", axis = 1).values
+            ).float()
 
         else:
             print("Reading input chunks...")
+            chunk_idx: int
             gt_chunk: pd.DataFrame
-            chunk_idx: int = 0
-            for gt_chunk in gt:
+            for chunk_idx, gt_chunk in enumerate(gt):
                 print("Current chunk: {}".format(chunk_idx))
                 gt_chunk_tensor: torch.Tensor = self.transforms(
-                    gt_chunk.drop("IID", axis = 1)
+                    gt_chunk.drop("IID", axis = 1).values
                 ).float()
-                print("Chunk {} encoding complete.".format(chunk_idx))
                 del gt_chunk  # mem management
 
                 try:

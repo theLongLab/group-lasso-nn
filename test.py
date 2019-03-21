@@ -38,8 +38,12 @@ def main(config: dict, resume: Optional[str]):
 
     # Obtain function handles of loss and metrics.
     loss_fn: Callable = getattr(module_loss, config["loss"])
+    loss_args: dict = config["loss"]["args"]
     metric_fns: List[Callable] = [
         getattr(module_metric, met) for met in config["metrics"]
+    ]
+    metric_args: List[dict] = [
+        config["metrics"][met] for met in config["metrics"]
     ]
 
     # Load state dict.
@@ -68,14 +72,15 @@ def main(config: dict, resume: Optional[str]):
             # save sample images, or do something with output here
             #
             # computing loss, metrics on test set
-            loss: torch.Tensor = loss_fn(output, target)
+            loss: torch.Tensor = loss_fn(output, target, **loss_args)
             batch_size: int = data.shape[0]
             total_loss += loss.item() * batch_size
 
             j: int
             metric: Callable
             for j, metric in enumerate(metric_fns):
-                total_metrics[j] += metric(output, target) * batch_size
+                total_metrics[j] += metric(output, target, **metric_args[j]) \
+                    * batch_size
 
     n_samples: int = len(data_loader.sampler)
     log: dict = {"loss": total_loss / n_samples}

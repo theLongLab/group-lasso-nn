@@ -24,7 +24,9 @@ class Trainer(BaseTrainer):
         self,
         model: Module,
         loss: Callable,
+        loss_args: dict,
         metrics: List[Callable],
+        metric_args: List[dict],
         optimizer: Optimizer,
         config: dict,
         resume: Optional[str],
@@ -34,7 +36,8 @@ class Trainer(BaseTrainer):
         train_logger: Optional[Logger] = None
     ) -> None:
         super(Trainer, self).__init__(
-            model, loss, metrics, optimizer, config, resume, train_logger
+            model, loss, loss_args, metrics, metric_args, optimizer, config,
+            resume, train_logger
         )
         self.config: dict = config
         self.data_loader: DataLoader = data_loader
@@ -55,7 +58,7 @@ class Trainer(BaseTrainer):
         i: int
         metric: Callable
         for i, metric in enumerate(self.metrics):
-            acc_metrics[i] += metric(output, target)
+            acc_metrics[i] += metric(output, target, **self.metric_args[i])
             self.writer.add_scalar(f"{metric.__name__}", acc_metrics[i])
         return acc_metrics
 
@@ -97,7 +100,9 @@ class Trainer(BaseTrainer):
             output: torch.Tensor = self.model(data)
 
             # for adjusted r-squared
-            loss: torch.Tensor = self.loss(output, target, data.shape[1])
+            loss: torch.Tensor = self.loss(
+                output, target, data.shape[1], **self.loss_args
+            )
             loss.backward()
             self.optimizer.step()
 

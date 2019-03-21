@@ -17,7 +17,7 @@ from trainer import Trainer
 from utils import Logger
 
 
-def get_instance(module, name: str, config: dict, *args: Iterable) -> Any:
+def get_instance(module, name: str, config: dict, *args) -> Any:
     return getattr(module, config[name]["type"])(*args, **config[name]["args"])
 
 
@@ -35,9 +35,13 @@ def main(config: dict, resume: Optional[str]) -> None:
     print(model)
 
     # Obtain function handles for loss and metrics.
-    loss: Callable = getattr(module_loss, config["loss"])
+    loss: Callable = getattr(module_loss, config["loss"]["type"])
+    loss_args: dict = config["loss"]["args"]
     metrics: List[Callable] = [
         getattr(module_metric, met) for met in config["metrics"]
+    ]
+    metric_args: List[dict] = [
+        config["metrics"][met] for met in config["metrics"]
     ]
 
     # Instantiate optimizer and learning rate scheduler.
@@ -54,7 +58,9 @@ def main(config: dict, resume: Optional[str]) -> None:
     trainer: Trainer = Trainer(
         model = model,
         loss = loss,
+        loss_args = loss_args,
         metrics = metrics,
+        metric_args = metric_args,
         optimizer = optimizer,
         config = config,
         resume = resume,
