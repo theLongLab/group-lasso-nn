@@ -14,7 +14,7 @@ pt_samples: pd.DataFrame = pd.read_csv(
 ).sort_values(by = "IID")
 
 for col in pt_samples.columns[1:]:
-    output_dir = os.path.join(processed_dir, col)
+    output_dir: str = os.path.join(processed_dir, col)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 

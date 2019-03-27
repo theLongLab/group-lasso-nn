@@ -2,79 +2,64 @@
 
 import os
 import sys
-from typing import Tuple
 
-import pandas as pd
-from pandas.io.parsers import TextFileReader
+import numpy as np
 from sklearn.model_selection import train_test_split
+import torch
 
+
+# Input params
 genotype_file: str = sys.argv[1]
 phenotype_file: str = sys.argv[2]
 output_root: str = sys.argv[3]
 
-genotypes: TextFileReader = pd.read_csv(
-    genotype_file, index_col = 0, chunksize = 100
+# Files
+genotypes: np.ndarray = np.loadtxt(genotype_file, delimiter = ',', skiprows = 1)
+phenotypes: np.ndarray = np.loadtxt(
+    phenotype_file, delimiter = ',', skiprows = 1
 )
-phenotypes: pd.DataFrame = pd.read_csv(phenotype_file, index_col = 0)
 
-os.mkdir(os.path.join(output_root, "train"))
-os.mkdir(os.path.join(output_root, "test"))
+# Folder prep
 pt: str = os.path.basename(output_root)
+train_dir: str = os.path.join(output_root, "train")
+test_dir: str = os.path.join(output_root, "test")
+if not os.path.isdir(train_dir):
+    os.mkdir(train_dir)
+if not os.path.isdir(test_dir):
+    os.mkdir(test_dir)
 
-chunk_idx: int
-gt_chunk: pd.DataFrame
-for chunk_idx, gt_chunk in enumerate(genotypes):
-    print("\ncurr chunk: {}".format(chunk_idx))
-    file_mode: str
-    header_write: bool
-    if chunk_idx == 0:
-        file_mode = 'w'
-        header_write = True
-    else:
-        file_mode = 'a'
-        header_write = False
+# Split
+gt_train: np.ndarray
+gt_test: np.ndarray
+pt_train: np.ndarray
+pt_test: np.ndarray
+gt_train, gt_test, pt_train, pt_test = train_test_split(
+    genotypes, phenotypes, test_size = 0.2
+)
+print("split done")
 
-    gt_test: pd.DataFrame
-    pt_train: pd.DataFrame
-    pt_test: pd.DataFrame
-    gt_train, gt_test, pt_train, pt_test = train_test_split(
-        gt_chunk, phenotypes.loc[gt_chunk.index.values], test_size = 0.2
-    )
-    print("split done")
+# Save
+torch.save(
+    torch.from_numpy(gt_train).float(),
+    os.path.join(train_dir, "lipids_genotype_" + pt + "_train.pth")
+)
+print("gt train done")
 
-    gt_train.to_csv(
-        os.path.join(
-            output_root, "train", "lipids_genotype_" + pt + "_train.csv"
-        ),
-        header = header_write,
-        mode = file_mode
-    )
-    print("gt train done")
+torch.save(
+    torch.from_numpy(gt_test).float(),
+    os.path.join(train_dir, "lipids_genotype_" + pt + "_test.pth")
+)
+print("gt test done")
 
-    gt_test.to_csv(
-        os.path.join(
-            output_root, "test", "lipids_genotype_" + pt + "_test.csv"
-        ),
-        header = header_write,
-        mode = file_mode
-    )
-    print("gt test done")
+torch.save(
+    torch.from_numpy(pt_train).float(),
+    os.path.join(test_dir, "lipids_phenotype_" + pt + "_train.pth")
+)
+print("pt train done")
 
-    pt_train.to_csv(
-        os.path.join(
-            output_root, "train", "lipids_phenotype_" + pt + "_train.csv"
-        ),
-        header = header_write,
-        mode = file_mode
-    )
-    print("pt train done")
-
-    pt_test.to_csv(
-        os.path.join(
-            output_root, "test", "lipids_phenotype_" + pt + "_test.csv"
-        ),
-        header = header_write,
-        mode = file_mode
-    )
-    print("pt test done")
+torch.save(
+    torch.from_numpy(pt_test).float(),
+    os.path.join(test_dir, "lipids_phenotype_" + pt + "_test.pth")
+)
+print("pt test done")
 

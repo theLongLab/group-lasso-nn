@@ -20,51 +20,25 @@ class LipidDataset(Dataset):
         train: bool,
         transforms = None
     ) -> None:
-        self.transforms: Callable = torch.from_numpy  # transformation fn
-
-        # Data folder.
+        # File paths.
         phenotype_dir: str = os.path.basename(root)
         train_test: str = "test"
         if train:
             train_test = "train"
 
-        # File paths.
         input_file: str = os.path.join(
             root, train_test,
-            "lipids_genotype_" + phenotype_dir + '_' + train_test + ".csv"
+            "lipids_genotype_" + phenotype_dir + '_' + train_test + ".pth"
         )
         target_file: str = os.path.join(
             root, train_test,
-            "lipids_phenotype_" + phenotype_dir + '_' + train_test + ".csv"
+            "lipids_phenotype_" + phenotype_dir + '_' + train_test + ".pth"
         )
 
-        np_arr: np.ndarray = np.loadtxt(
-            input_file, delimiter = ',', skiprows = 1
-        )
-        sys.getsizeof(np_arr) # debugging
-        np_arr_noiid = np_arr[:, 1:]
-        del np_arr
-        sys.getsizeof(np_arr_noiid) # debugging
-
-        self.genotypes: torch.Tensor = self.transforms(np_arr_noiid).float()
-        del np_arr
-        print("Input loading complete.")
-
-        sys.exit("test done") # debugging
-
-        # Target.
-        # self.phenotypes: torch.Tensor = self.transforms(
-        #     np.array(
-        #         dd.read_csv(
-        #             target_file,
-        #             usecols = [1],
-        #             blocksize = block_size,
-        #             dtype = float,
-        #             sample = dask_sample
-        #         ).values
-        #     )
-        # ).float()
-        print("Target loading complete.")
+        # Data loading.
+        self.genotypes: torch.Tensor = torch.load(input_file)
+        self.phenotypes: torch.Tensor = torch.load(target_file)
+        print("Data loading complete.")
 
         self.data_len: int = self.genotypes.shape[0]  # sample size
         self.feats: int = self.genotypes.shape[1]  # number of encoded features
