@@ -37,7 +37,7 @@ def main(config: dict, resume: Optional[str]):
     model.summary()
 
     # Obtain function handles of loss and metrics.
-    loss_fn: Callable = getattr(module_loss, config["loss"])
+    loss_fn: Callable = getattr(module_loss, config["loss"]["type"])
     loss_args: dict = config["loss"]["args"]
     metric_fns: List[Callable] = [
         getattr(module_metric, met) for met in config["metrics"]

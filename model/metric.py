@@ -17,7 +17,7 @@ def mae(output: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
 def corr(output: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
     with torch.no_grad():
         vx: torch.Tensor = output - torch.mean(output)
-        vy: torch.Tnsor = target - torch.mean(target)
+        vy: torch.Tensor = target - torch.mean(target)
         return torch.sum(vx * vy) / (
             torch.sqrt(torch.sum(vx ** 2)) * torch.sqrt(torch.sum(vy ** 2)))
 
