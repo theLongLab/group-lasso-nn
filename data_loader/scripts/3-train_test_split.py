@@ -47,13 +47,13 @@ print("gt train done")
 
 torch.save(
     torch.from_numpy(gt_test).float(),
-    os.path.join(train_dir, "lipids_genotype_" + pt + "_test.pth")
+    os.path.join(test_dir, "lipids_genotype_" + pt + "_test.pth")
 )
 print("gt test done")
 
 torch.save(
     torch.from_numpy(pt_train).float(),
-    os.path.join(test_dir, "lipids_phenotype_" + pt + "_train.pth")
+    os.path.join(train_dir, "lipids_phenotype_" + pt + "_train.pth")
 )
 print("pt train done")
 
