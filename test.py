@@ -72,7 +72,9 @@ def main(config: dict, resume: Optional[str]):
             # save sample images, or do something with output here
             #
             # computing loss, metrics on test set
-            loss: torch.Tensor = loss_fn(output, target, **loss_args)
+            loss: torch.Tensor = loss_fn(
+                output, target, data.shape[1] **loss_args
+            )
             batch_size: int = data.shape[0]
             total_loss += loss.item() * batch_size
 

@@ -175,7 +175,9 @@ class Trainer(BaseTrainer):
                 data, target = data.to(self.device), target.to(self.device)
 
                 output: torch.Tensor = self.model(data)
-                loss: torch.Tensor = self.loss(output, target)
+                loss: torch.Tensor = self.loss(
+                    output, target, data.shape[1], **self.loss_args
+                )
 
                 self.writer.set_step(
                     (epoch - 1) * len(self.valid_data_loader)
