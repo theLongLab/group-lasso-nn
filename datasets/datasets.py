@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 from typing import Callable, Optional, Tuple, Union
 
 import numpy as np
-import dask.dataframe as dd
 import torch
 from torch.utils.data import Dataset
 
@@ -18,8 +18,6 @@ class LipidDataset(Dataset):
         self,
         root: str,
         train: bool,
-        block_size: Optional[float],
-        dask_sample: Optional[int],
         transforms = None
     ) -> None:
         self.transforms: Callable = torch.from_numpy  # transformation fn
@@ -40,31 +38,32 @@ class LipidDataset(Dataset):
             "lipids_phenotype_" + phenotype_dir + '_' + train_test + ".csv"
         )
 
-        # Inputs.
-        self.genotypes: torch.Tensor = self.transforms(
-            np.array(
-                dd.read_csv(
-                    input_file,
-                    blocksize = block_size,
-                    dtype = int,
-                    sample = dask_sample
-                ).drop("IID", axis = 1).values
-            )
-        ).float()
+        np_arr: np.ndarray = np.loadtxt(
+            input_file, delimiter = ',', skiprows = 1
+        )
+        sys.getsizeof(np_arr) # debugging
+        np_arr_noiid = np_arr[:, 1:]
+        del np_arr
+        sys.getsizeof(np_arr_noiid) # debugging
+
+        self.genotypes: torch.Tensor = self.transforms(np_arr_noiid).float()
+        del np_arr
         print("Input loading complete.")
 
+        sys.exit("test done") # debugging
+
         # Target.
-        self.phenotypes: torch.Tensor = self.transforms(
-            np.array(
-                dd.read_csv(
-                    target_file,
-                    usecols = [1],
-                    blocksize = block_size,
-                    dtype = float,
-                    sample = dask_sample
-                ).values
-            )
-        ).float()
+        # self.phenotypes: torch.Tensor = self.transforms(
+        #     np.array(
+        #         dd.read_csv(
+        #             target_file,
+        #             usecols = [1],
+        #             blocksize = block_size,
+        #             dtype = float,
+        #             sample = dask_sample
+        #         ).values
+        #     )
+        # ).float()
         print("Target loading complete.")
 
         self.data_len: int = self.genotypes.shape[0]  # sample size
