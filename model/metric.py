@@ -22,7 +22,14 @@ def rsquared(output: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
         return rsquared
 
 
-def corr(output: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+def adj_rsqr(
+    output: torch.Tensor,
+    target: torch.Tensor,
+    input_feats: int
+) -> torch.Tensor:
     with torch.no_grad():
-        return torch.sqrt(rsquared(output, target))
+        rsquared: torch.Tensor = rsquared(output, target)
+        adj_rsqr: torch.Tensor = 1 - (1 - rsquared) * (len(target) - 1) \
+            / (len(target) - input_feats - 1)
+        return adj_rsqr
 

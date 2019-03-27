@@ -4,15 +4,12 @@ import torch
 import torch.nn.functional as F
 
 
-def adj_rsqr(
-    output: torch.Tensor,
-    target: torch.Tensor,
-    input_feats: int
-) -> torch.Tensor:
-    ss_res: torch.Tensor = torch.sum((target - output) ** 2)
-    ss_tot: torch.Tensor = torch.sum((target - target.mean()) ** 2)
-    rsquared: torch.Tensor = 1 - ss_res / ss_tot
-    adj_rsqr: torch.Tensor = 1 - (1 - rsquared) * (len(target) - 1) \
-        / (len(target) - input_feats - 1)
-    return adj_rsqr
+def corr(output: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+    vx: torch.Tensor = output - torch.mean(output)
+    vy: torch.Tnsor = target - torch.mean(target)
+    return torch.sum(vx * vy) / (
+        torch.sqrt(torch.sum(vx ** 2)) * torch.sqrt(torch.sum(vy ** 2)))
+
+
+
 

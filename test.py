@@ -72,17 +72,21 @@ def main(config: dict, resume: Optional[str]):
             # save sample images, or do something with output here
             #
             # computing loss, metrics on test set
-            loss: torch.Tensor = loss_fn(
-                output, target, data.shape[1] **loss_args
-            )
+            loss: torch.Tensor = loss_fn(output, target, **loss_args)
             batch_size: int = data.shape[0]
             total_loss += loss.item() * batch_size
 
             j: int
             metric: Callable
             for j, metric in enumerate(metric_fns):
-                total_metrics[j] += metric(output, target, **metric_args[j]) \
-                    * batch_size
+                if metric.__name__ == "adj_rsqr":
+                    total_metrics[j] += metric(
+                        output, target, data.shape[1], **metric_args[j]
+                    ) * batch_size
+                else:
+                    total_metrics[j] += metric(
+                        output, target, **metric_args[j]
+                    ) * batch_size
 
     n_samples: int = len(data_loader.sampler)
     log: dict = {"loss": total_loss / n_samples}

@@ -51,14 +51,21 @@ class Trainer(BaseTrainer):
     def _eval_metrics(
         self,
         output: torch.Tensor,
-        target: torch.Tensor
+        target: torch.Tensor,
+        input_feats: int
     ) -> np.ndarray:
         acc_metrics: np.ndarray = np.zeros(len(self.metrics))
 
         i: int
         metric: Callable
         for i, metric in enumerate(self.metrics):
-            acc_metrics[i] += metric(output, target, **self.metric_args[i])
+            if metric.__name__ == "adj_rsqr":
+                acc_metrics[i] += metric(
+                    output, target, input_feats, **self.metric_args[i]
+                )
+            else:
+                acc_metrics[i] += metric(output, target, **self.metric_args[i])
+
             self.writer.add_scalar(f"{metric.__name__}", acc_metrics[i])
         return acc_metrics
 
@@ -99,10 +106,7 @@ class Trainer(BaseTrainer):
             self.optimizer.zero_grad()
             output: torch.Tensor = self.model(data)
 
-            # for adjusted r-squared
-            loss: torch.Tensor = self.loss(
-                output, target, data.shape[1], **self.loss_args
-            )
+            loss: torch.Tensor = self.loss(output, target, **self.loss_args)
             loss.backward()
             self.optimizer.step()
 
@@ -111,7 +115,7 @@ class Trainer(BaseTrainer):
             )
             self.writer.add_scalar("loss", loss.item())
             total_loss += loss.item()
-            total_metrics += self._eval_metrics(output, target)
+            total_metrics += self._eval_metrics(output, target, data.shape[1])
 
             if self.verbosity >= 2 and batch_idx % self.log_step == 0:
                 self.logger.info(
@@ -175,9 +179,7 @@ class Trainer(BaseTrainer):
                 data, target = data.to(self.device), target.to(self.device)
 
                 output: torch.Tensor = self.model(data)
-                loss: torch.Tensor = self.loss(
-                    output, target, data.shape[1], **self.loss_args
-                )
+                loss: torch.Tensor = self.loss(output, target, **self.loss_args)
 
                 self.writer.set_step(
                     (epoch - 1) * len(self.valid_data_loader)
