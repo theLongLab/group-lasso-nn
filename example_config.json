@@ -25,12 +25,14 @@
         }
     },
     "loss": {
-        "type": "adj_rsqr",
+        "type": "corr",
         "args": {}
     },
     "metrics": {
         "rmse": {},
-        "rsquared": {}
+        "mae": {},
+        "rsquared": {},
+        "adj_rsqr": {}
     },
     "lr_scheduler": {
         "type": "StepLR",
