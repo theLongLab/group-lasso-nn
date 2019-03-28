@@ -28,9 +28,9 @@ class LipidMLP_Shallow(BaseModel):
 class LipidMLP_Deep(BaseModel):
     def __init__(self, input_feats: int) -> None:
         super(LipidMLP_Deep, self).__init__()
-        self.fc1 = nn.Linear(input_feats, 10000)
-        self.fc2 = nn.Linear(10000, 300)
-        self.fc3 = nn.Linear(300, 10)
+        self.fc1 = nn.Linear(input_feats, 1000)
+        self.fc2 = nn.Linear(1000, 100)
+        self.fc3 = nn.Linear(100, 10)
         self.fc4 = nn.Linear(10, 1)
         self.dropout = nn.Dropout(0.2)
 
