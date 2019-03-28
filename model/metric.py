@@ -14,12 +14,17 @@ def mae(output: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
         return F.l1_loss(output, target)
 
 
-def corr(output: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+def huber(output: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
     with torch.no_grad():
-        vx: torch.Tensor = output - torch.mean(output)
-        vy: torch.Tensor = target - torch.mean(target)
-        return torch.sum(vx * vy) / (
-            torch.sqrt(torch.sum(vx ** 2)) * torch.sqrt(torch.sum(vy ** 2)))
+        return F.smooth_l1_loss(output, target)
+
+
+# def corr(output: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+#     with torch.no_grad():
+#         vx: torch.Tensor = output - torch.mean(output)
+#         vy: torch.Tensor = target - torch.mean(target)
+#         return torch.sum(vx * vy) / (
+#             torch.sqrt(torch.sum(vx ** 2)) * torch.sqrt(torch.sum(vy ** 2)))
 
 
 def rsquared(output: torch.Tensor, target: torch.Tensor) -> torch.Tensor:

@@ -25,14 +25,13 @@
         }
     },
     "loss": {
-        "type": "huber",
+        "type": "rsquared_loss",
         "args": {}
     },
     "metrics": {
         "rmse": {},
         "mae": {},
-        "corr": {},
-        "rsquared": {},
+        "huber": {},
         "adj_rsqr": {}
     },
     "lr_scheduler": {

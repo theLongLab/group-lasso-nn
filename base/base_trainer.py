@@ -128,10 +128,9 @@ class BaseTrainer:
 
         if n_gpu_use > n_gpu:
             self.logger.warning(
-                "Warning: The number of GPU's configured to use is {}, but "
-                + "only {} are available on this machine.".format(
-                    n_gpu_use, n_gpu
-                )
+                "Warning: The number of GPU's configured to use is "
+                + "{}, but only {} ".format(n_gpu_use, n_gpu)
+                + "are available on this machine."
             )
             n_gpu_use = n_gpu
 
