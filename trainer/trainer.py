@@ -187,7 +187,9 @@ class Trainer(BaseTrainer):
                 )
                 self.writer.add_scalar("loss", loss.item())
                 total_val_loss += loss.item()
-                total_val_metrics += self._eval_metrics(output, target)
+                total_val_metrics += self._eval_metrics(
+                    output, target, data.shape[1]
+                )
                 self.writer.add_image(
                     "input", make_grid(data.cpu(), nrow = 8, normalize = True)
                 )
