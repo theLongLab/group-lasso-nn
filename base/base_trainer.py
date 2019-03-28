@@ -136,7 +136,7 @@ class BaseTrainer:
             n_gpu_use = n_gpu
 
         device: torch.device = torch.device(
-            "cuda:1" if n_gpu_use > 0 else "cpu"
+            "cuda:0" if n_gpu_use > 0 else "cpu"
         )
         list_ids: List[int] = list(range(n_gpu_use))
 
