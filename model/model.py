@@ -25,7 +25,6 @@ class LipidMLP_Shallow(BaseModel):
         super(LipidMLP_Shallow, self).__init__()
         self.dense1 = nn.Linear(input_feats, 100)
         self.output = nn.Linear(100, 1)
-        self.prelu = nn.PReLU()
         self.dropout = nn.Dropout(0.2)
 
 
@@ -33,7 +32,7 @@ class LipidMLP_Shallow(BaseModel):
         x: torch.Tensor = inputs[0]
 
         # data is already flat, no need to flatten
-        x = self.prelu(self.dense1(x))
+        x = F.leaky_relu(self.dense1(x))
         x = self.dropout(x)
         return self.output(x)
 
@@ -45,7 +44,6 @@ class LipidMLP_Deep(BaseModel):
         self.dense2 = nn.Linear(1000, 100)
         self.dense3 = nn.Linear(100, 10)
         self.output = nn.Linear(10, 1)
-        self.prelu = nn.PReLU()
         self.dropout = nn.Dropout(0.2)
 
 
@@ -53,11 +51,11 @@ class LipidMLP_Deep(BaseModel):
         x: torch.Tensor = inputs[0]
 
         # data is already flat, no need to flatten
-        x = self.prelu(self.dense1(x))
+        x = F.leaky_relu(self.dense1(x))
         x = self.dropout(x)
-        x = self.prelu(self.dense2(x))
+        x = F.leaky_relu(self.dense2(x))
         x = self.dropout(x)
-        x = self.prelu(self.dense3(x))
+        x = F.leaky_relu(self.dense3(x))
         x = self.dropout(x)
         return self.output(x)
 
