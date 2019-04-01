@@ -9,6 +9,19 @@ import torch.nn.functional as F
 from base import BaseModel
 
 
+class LipidMLP_LR(BaseModel):
+    def __init__(self, input_feats: int) -> None:
+        super(LipidMLP_LR, self).__init__()
+        self.fc1 = nn.Linear(input_feats, 1)
+
+
+    def forward(self, *inputs: torch.Tensor) -> torch.Tensor:
+        x: torch.Tensor = inputs[0]
+        print("x shape: {}".format(x.shape))  # debugging
+        x = self.fc1(x)
+        return x
+
+
 class LipidMLP_Shallow(BaseModel):
     def __init__(self, input_feats: int) -> None:
         super(LipidMLP_Shallow, self).__init__()
