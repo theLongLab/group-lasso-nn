@@ -8,6 +8,7 @@ from typing import Any, Callable, Iterable, List, Optional
 import adabound
 import torch
 from torch.nn import Module
+import torch.nn as module_optim
 from torch.utils.data import DataLoader
 
 import data_loader.data_loaders as module_data
@@ -51,15 +52,16 @@ def main(config: dict, resume: Optional[str]) -> None:
         lambda p: p.requires_grad, model.parameters()
     )
 
-    module_optim = ''
-    if config["type"] == "Adabound":
-        module_optim = adabound
-    else:
-        module_optim = torch.optim
+    optimizer = None
+    try:
+        optimizer = get_instance(
+            module_optim, "optimizer", config, trainable_params
+        )
+    except AttributeError:
+        optimizer = get_instance(
+            adabound, "optimizer", config, trainable_params
+        )
 
-    optimizer = get_instance(
-        module_optim, "optimizer", config, trainable_params
-    )
     lr_scheduler = get_instance(
         torch.optim.lr_scheduler, "lr_scheduler", config, optimizer
     )
