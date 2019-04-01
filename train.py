@@ -5,6 +5,7 @@ import json
 import os
 from typing import Any, Callable, Iterable, List, Optional
 
+import adabound
 import torch
 from torch.nn import Module
 from torch.utils.data import DataLoader
@@ -49,7 +50,16 @@ def main(config: dict, resume: Optional[str]) -> None:
     trainable_params: Iterable[torch.Tensor] = filter(
         lambda p: p.requires_grad, model.parameters()
     )
-    optimizer = get_instance(torch.optim, "optimizer", config, trainable_params)
+
+    module_optim = ''
+    if config["type"] == "Adabound":
+        module_optim = adabound
+    else:
+        module_optim = torch.optim
+
+    optimizer = get_instance(
+        module_optim, "optimizer", config, trainable_params
+    )
     lr_scheduler = get_instance(
         torch.optim.lr_scheduler, "lr_scheduler", config, optimizer
     )

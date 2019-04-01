@@ -17,7 +17,6 @@ class LipidMLP_LR(BaseModel):
 
     def forward(self, *inputs: torch.Tensor) -> torch.Tensor:
         x: torch.Tensor = inputs[0]
-        print("x shape: {}".format(x.shape))  # debugging
         x = self.fc1(x)
         return x
 
@@ -50,11 +49,11 @@ class LipidMLP_Deep(BaseModel):
 
     def forward(self, *inputs: torch.Tensor) -> torch.Tensor:
         x: torch.Tensor = inputs[0]
-        x = F.relu(self.fc1(x))  # data is already flat, no need to flatten
+        x = F.prelu(self.fc1(x))  # data is already flat, no need to flatten
         x = self.dropout(x)
-        x = F.relu(self.fc2(x))
+        x = F.prelu(self.fc2(x))
         x = self.dropout(x)
-        x = F.relu(self.fc3(x))
+        x = F.prelu(self.fc3(x))
         x = self.dropout(x)
         x = self.fc4(x)
         return x

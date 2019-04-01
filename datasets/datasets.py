@@ -37,7 +37,9 @@ class LipidDataset(Dataset):
 
         # Data loading.
         self.genotypes: torch.Tensor = torch.load(input_file)[:, 1:]
-        self.phenotypes: torch.Tensor = torch.load(target_file)[:, 1]
+        self.phenotypes: torch.Tensor = torch.load(
+            target_file
+        )[:, 1].unsqueeze(1)
         print("Data loading complete.")
 
         self.data_len: int = self.genotypes.shape[0]  # sample size
