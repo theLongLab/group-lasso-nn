@@ -8,7 +8,7 @@ from typing import Any, Callable, Iterable, List, Optional
 import adabound
 import torch
 from torch.nn import Module
-import torch.nn as module_optim
+import torch.optim as module_optim
 from torch.utils.data import DataLoader
 
 import data_loader.data_loaders as module_data
